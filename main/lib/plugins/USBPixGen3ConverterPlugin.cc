@@ -37,7 +37,7 @@
 
 namespace eudaq {
 
-static const std::string USBPIX_GEN3_NAME = "USBPIX_GEN3";
+static const std::string USBPIX_GEN3_NAME = "USBPIX_GEN2";
 
 class USBPixGen3ConverterPlugin: public eudaq::DataConverterPlugin {
 
