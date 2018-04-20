@@ -80,6 +80,9 @@ namespace eudaq {
       return eudaq::from_string(GetTag(name), def);
     }
     std::map<std::string, std::string> GetTags() const { return m_tags; }
+    
+    bool HasTag(const std::string &name) const;
+    std::vector<std::string> GetTagList(const std::string &prefix) const;
 
     bool IsBORE() const { return GetFlags(FLAG_BORE) != 0; }
     bool IsEORE() const { return GetFlags(FLAG_EORE) != 0; }
