@@ -51,7 +51,7 @@ namespace eudaq {
 
   void PluginManager::Initialize(const DetectorEvent &dev) {
     eudaq::Configuration conf(dev.GetTag("CONFIG"));
-    conf.Set("timeDelay", dev.GetTag("longTimeDelay", "0"));
+    //conf.Set("timeDelay", dev.GetTag("longTimeDelay", "0"));
     for (size_t i = 0; i < dev.NumEvents(); ++i) {
       const eudaq::Event &subev = *dev.GetEvent(i);
       GetInstance().GetPlugin(subev).Initialize(subev, conf);

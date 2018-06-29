@@ -367,6 +367,8 @@ namespace eudaq {
       std::cout << "NIConverterPlugin::GetLCIOSubEvent data " << std::endl;
     result.parameters().setValue(eutelescope::EUTELESCOPE::EVENTTYPE,
                                  eutelescope::kDE);
+    result.parameters().setValue("TLU_TRIGGER_ID_TELESCOPE",
+                                  static_cast<int>(GetTriggerID(source)));
 
     // prepare the collections for the rawdata and the zs ones
     LCCollectionVec *rawDataCollection, *zsDataCollection, *zs2DataCollection;
