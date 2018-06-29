@@ -5,6 +5,7 @@
 #include "eudaq/Timer.hh"
 
 #include "eudaq/FEI4Decoder.hh"
+#include <eudaq/PluginManager.hh>
 
 #include <cstdlib>
 #include <cstring>
@@ -69,6 +70,7 @@ virtual bool GetLCIOSubEvent(lcio::LCEvent & lcioEvent, eudaq::Event const & eud
     	}
 
 	lcioEvent.parameters().setValue( eutelescope::EUTELESCOPE::EVENTTYPE, eutelescope::kDE );
+	lcioEvent.parameters().setValue("TLU_TRIGGER_ID_APIX", static_cast<int>(eudaq::PluginManager::GetTriggerID(evRaw)));
 	LCCollectionVec * dataCollection;
 
 	auto dataCollectionExists = false;
@@ -125,14 +127,14 @@ virtual bool GetLCIOSubEvent(lcio::LCEvent & lcioEvent, eudaq::Event const & eud
       cnf.Print(std::cout);
 	
 	cnf.SetSection("Producer.MimosaNI");
-	std::cout << "Test confi param: " << cnf.Get("NiIPaddr", "failed") << std::endl;
+	//std::cout << "Test confi param: " << cnf.Get("NiIPaddr", "failed") << std::endl;
 
 
       if(boardID != -999) {
           attachedBoards.emplace_back(boardID);
           boardChannels[boardID] = std::vector<int>();
           boardInitialized[boardID] = false;
-          std::cout << "Added USBPix Board: " << boardID << " to list!" << std::endl;
+          //std::cout << "Added USBPix Board: " << boardID << " to list!" << std::endl;
       } 
     }
 
@@ -172,6 +174,7 @@ virtual bool GetStandardSubEvent(StandardEvent& sev, eudaq::Event const & ev) co
 	return true;
 }
 
+/*
 virtual unsigned GetTriggerID(const Event & ev) const {
 	//The trigger id is always the first 4 words in each event's data block
 	//we only need the first 24 bit though! (the most significant 8 will be zeroes)
@@ -181,6 +184,23 @@ virtual unsigned GetTriggerID(const Event & ev) const {
                     ( static_cast<uint32_t>(data[1]) << 8 ) |
                     ( static_cast<uint32_t>(data[0]) );
 	return i;
+}
+*/
+virtual unsigned GetTriggerID(const Event & ev) const {
+  auto evRaw = dynamic_cast<RawDataEvent const &>(ev);
+  auto data = evRaw.GetBlock(0);
+  auto dataLen = data.size();
+  uint32_t i =( static_cast<uint32_t>(data[dataLen-8]) << 24 ) |
+        ( static_cast<uint32_t>(data[dataLen-7]) << 16 ) |
+                    ( static_cast<uint32_t>(data[dataLen-6]) << 8 ) |
+                    ( static_cast<uint32_t>(data[dataLen-5]) );
+
+  uint32_t j =( static_cast<uint32_t>(data[dataLen-1]) << 24 ) |
+        ( static_cast<uint32_t>(data[dataLen-2]) << 16 ) |
+                    ( static_cast<uint32_t>(data[dataLen-3]) << 8 ) |
+                    ( static_cast<uint32_t>(data[dataLen-4]) );
+
+  return get_tr_no_2(i, j);
 }
 
 	//Static instance needed for EUDAQ
